@@ -23,7 +23,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    let texture_handle: Handle<Image> = asset_server.load("prototype-square-atlas.png");
+    let texture_handle: Handle<Image> = asset_server.load("prototype-cube-atlas.png");
 
     let map_size = TilemapSize { x: 16, y: 16 };
     let tilemap_entity = commands.spawn_empty().id();
@@ -43,8 +43,8 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }
     }
 
-    let tile_size = TilemapTileSize { x: 16.0, y: 8.0 };
-    let grid_size = tile_size.into();
+    let tile_size = TilemapTileSize { x: 16.0, y: 16.0 };
+    let grid_size = TilemapGridSize { x: 16.0, y: 8.0 };
     let map_type: TilemapType = TilemapType::Isometric(IsoCoordSystem::Diamond);
 
     commands.entity(tilemap_entity).insert(TilemapBundle {
@@ -55,6 +55,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         texture: TilemapTexture::Single(texture_handle),
         tile_size,
         render_settings: TilemapRenderSettings {
+            render_chunk_size: UVec2::new(3, 1),
             y_sort: true,
             ..Default::default()
         },
