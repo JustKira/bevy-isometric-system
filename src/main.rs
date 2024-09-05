@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ecs::observer::TriggerTargets, prelude::*};
 use bevy_ecs_tilemap::prelude::*;
 
 fn main() {
@@ -23,9 +23,9 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    let texture_handle: Handle<Image> = asset_server.load("prototype-square.png");
+    let texture_handle: Handle<Image> = asset_server.load("prototype-cube.png");
 
-    let map_size = TilemapSize { x: 8, y: 8 };
+    let map_size = TilemapSize { x: 16, y: 16 };
     let tilemap_entity = commands.spawn_empty().id();
     let mut tile_storage = TileStorage::empty(map_size);
 
@@ -43,7 +43,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }
     }
 
-    let tile_size = TilemapTileSize { x: 16.0, y: 8.0 };
+    let tile_size = TilemapTileSize { x: 16.0, y: 16.0 };
     let grid_size = tile_size.into();
     let map_type = TilemapType::Isometric(IsoCoordSystem::Diamond);
 
