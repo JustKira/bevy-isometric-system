@@ -1,4 +1,4 @@
-use bevy::{ecs::observer::TriggerTargets, prelude::*};
+use bevy::{ecs::observer::TriggerTargets, prelude::*, transform::commands};
 use bevy_ecs_tilemap::prelude::*;
 
 fn main() {
@@ -23,7 +23,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..Default::default()
     });
 
-    let texture_handle: Handle<Image> = asset_server.load("prototype-cube.png");
+    let texture_handle: Handle<Image> = asset_server.load("prototype-square-atlas.png");
 
     let map_size = TilemapSize { x: 16, y: 16 };
     let tilemap_entity = commands.spawn_empty().id();
@@ -43,9 +43,9 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         }
     }
 
-    let tile_size = TilemapTileSize { x: 16.0, y: 16.0 };
+    let tile_size = TilemapTileSize { x: 16.0, y: 8.0 };
     let grid_size = tile_size.into();
-    let map_type = TilemapType::Isometric(IsoCoordSystem::Diamond);
+    let map_type: TilemapType = TilemapType::Isometric(IsoCoordSystem::Diamond);
 
     commands.entity(tilemap_entity).insert(TilemapBundle {
         grid_size,
@@ -55,9 +55,9 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         texture: TilemapTexture::Single(texture_handle),
         tile_size,
         render_settings: TilemapRenderSettings {
+            y_sort: true,
             ..Default::default()
         },
-
         transform: get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.0),
         ..Default::default()
     });
@@ -91,8 +91,9 @@ pub fn update_cursor_pos(
 }
 
 fn get_tile_on_mouse_position(
+    mut commands: Commands,
     cursor_pos: Res<CursorPos>,
-    query: Query<(
+    tile: Query<(
         &TilemapSize,
         &TilemapGridSize,
         &TilemapType,
@@ -100,7 +101,7 @@ fn get_tile_on_mouse_position(
         &Transform,
     )>,
 ) {
-    for (map_size, grid_size, map_type, tile_storage, map_transform) in query.iter() {
+    for (map_size, grid_size, map_type, tile_storage, map_transform) in tile.iter() {
         // Grab the cursor position from the `Res<CursorPos>`
         let cursor_pos: Vec2 = cursor_pos.0;
         // We need to make sure that the cursor's world position is correct relative to the map
@@ -117,6 +118,7 @@ fn get_tile_on_mouse_position(
         {
             // Now we can get the entity at the tile position.
             if let Some(tile_entity) = tile_storage.get(&tile_pos) {
+                commands.entity(tile_entity).insert(TileTextureIndex(1));
                 println!(
                     "Tile entity at cursor pos: {:?} , pos {:?}",
                     tile_entity, tile_pos
